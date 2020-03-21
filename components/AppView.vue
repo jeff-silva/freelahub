@@ -20,10 +20,8 @@
 
         <div :class="props.rightClasses">
           <div class="row no-gutters align-items-center">
-            <div class="col-1 text-center d-md-none">
-            	<a href="javascript:;" @click="drawerShow=!drawerShow;">
-            		<i class="fa fa-fw fa-bars"></i>
-            	</a>
+            <div class="col-1 d-md-none">
+            	<a href="javascript:;" class="fa fa-fw fa-bars" @click="drawerShow=!drawerShow;"></a>
             </div>
             <div class="col">
               <slot name="header">&lt;template v-slot:header&gt;&hellip;&lt;/template&gt;</slot>
@@ -52,7 +50,6 @@
   <div v-else class="app-view-auth">
     <slot name="auth">&lt;template v-slot:auth&gt;&hellip;&lt;/template&gt;</slot>
   </div>
-
 </div></template>
 
 <script>
@@ -60,7 +57,7 @@ export default {
   name: 'AppView',
   props: {
     auth: {default:false},
-    leftClasses: {default:'d-none d-md-block col-3'},
+    leftClasses: {default:'d-none d-md-block col-4 col-md-2'},
     rightClasses: {default:'col'},
     headerClasses: {default:'bg-light'},
   },
@@ -83,6 +80,15 @@ export default {
       this.headerHeight = (this.$refs.header? this.$refs.header.offsetHeight: 0);
       this.bodyHeight = this.appHeight-this.headerHeight;
     },
+  },
+
+  watch: {
+  	$props: {
+  		deep: true,
+  		handler() {
+  			setTimeout(this.refreshSizes, 100);
+  		},
+  	},
   },
 
   mounted() {

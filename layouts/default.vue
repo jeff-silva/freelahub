@@ -1,23 +1,10 @@
 <template><div>
-  <AppView :auth="{}">
+  <AppView :auth="$store.getters['auth/user']">
     <!-- auth -->
     <template v-slot:auth>
-      <form action="" style="width:95%; max-width:300px;">
-        <div style="background:#eee; height:200px;"></div>
-        <br><br>
-
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" class="form-control">
-        </div>
-
-        <div class="form-group">
-          <label>Senha</label>
-          <input type="password" class="form-control">
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-block">Login</button>
-      </form>
+      <div style="width:90%; max-width:400px; background:#eee; padding:15px;">
+        <Auth></Auth>
+      </div>
     </template>
     <!-- auth -->
 
@@ -43,7 +30,7 @@
       <div class="list-group">
         <nuxt-link class="list-group-item" data-close to="/">Dashboard</nuxt-link>
         <nuxt-link class="list-group-item" data-close to="/bbb">Bbb</nuxt-link>
-        <nuxt-link class="list-group-item" data-close to="/">Logout</nuxt-link>
+        <a href="javascript:;" class="list-group-item" data-close @click="$store.dispatch('auth/logout');">Logout</a>
       </div>
     </template>
     <!-- drawer -->
@@ -59,10 +46,16 @@
 
 <script>
 import AppView from '~/components/AppView.vue';
+import Auth from '~/components/Auth.vue';
 
 export default {
   components: {
     AppView,
+    Auth,
+  },
+
+  mounted() {
+    this.$store.dispatch('auth/check');
   }
 }
 </script>
