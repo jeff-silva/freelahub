@@ -12,8 +12,12 @@ module.exports = {
       { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+      {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'},
+      {rel: "stylesheet", type: "text/css", href: 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css'},
+      {rel: "stylesheet", type: "text/css", href: 'https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.4.1/lux/bootstrap.min.css'},
+      {rel: "stylesheet", type: "text/css", href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'},
+      {rel: "stylesheet", type: "text/css", href: 'https://cdn.jsdelivr.net/npm/animate.css@3.5.1'},
+    ],
   },
   /*
   ** Customize the progress-bar color
@@ -59,5 +63,9 @@ module.exports = {
     */
     extend (config, ctx) {
     }
-  }
+  },
+
+  serverMiddleware: [
+    '~/api/index.js',
+  ],
 }
