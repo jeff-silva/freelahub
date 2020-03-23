@@ -66,6 +66,8 @@
     </template>
     <!-- content -->
   </AppView>
+
+  <pre>$data: {{ $data }}</pre>
 </div></template>
 
 
@@ -78,6 +80,12 @@ export default {
   components: {
     AppView,
     Auth,
+  },
+
+  data() {
+    return {
+      firebase_apiKey: process.env.firebase_apiKey,
+    };
   },
 
   mounted() {
