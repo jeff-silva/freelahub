@@ -1,4 +1,4 @@
-import firebase from '~/plugins/firebase.js';
+import firebase from 'firebase';
 
 export default {
 	state() {
