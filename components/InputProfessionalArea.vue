@@ -1,34 +1,4 @@
 <template><div>
-
-  <!-- picker -->
-  <div style="position:relative;">
-    <div class="input-group">
-      <input type="text" class="form-control" :placeholder="placeholder">
-      <div class="input-group-append">
-        <div class="input-group-text">
-          <i class="fa fa-fw fa-search"></i>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-light shadow" style="position:static; top:100%; width:100%; max-height:300px; overflow:auto; z-index:8;">
-      <div v-for="s in segments" v-if="s.parent.length==0">
-        <div class="p-2"><small class="text-muted">&nbsp; {{ s.title }}:</small></div>
-        <label
-          class="p-2 d-block"
-          v-for="ss in segments"
-          :key="ss.id"
-          v-if="ss.parent.indexOf(s.id)>-1"
-          style="cursor:pointer;"
-        >
-          <input type="checkbox" v-model="props.value" :value="ss.id" style="display:none;">
-          <span class="fa fa-fw fa-check" v-if="props.value.indexOf(ss.id)>-1"></span>
-          <span class="fa fa-fw" v-else></span> {{ ss.title }}
-        </label>
-      </div>
-    </div>
-  </div>
-  <!-- picker -->
   
   <!-- edit -->
   <div v-if="edit">
@@ -91,7 +61,37 @@
   </div>
   <!-- edit -->
 
-  <pre>$data: {{ $data }}</pre>
+  <!-- picker -->
+  <div style="position:relative;" ref="picker">
+    <label class="input-group">
+      <div class="form-control" style="height:auto; overflow:hidden;">
+        <div class="badge" style="margin:0px 4px 0px 0px; background:#ccc;" v-for="(v, vindex) in props.value" v-if="segments[v]">
+          {{ segments[v].title }} <a href="javascript:;" class="fa fa-fw fa-remove" @click="props.value.splice(vindex, 1);"></a>
+        </div>
+        <input type="text" :placeholder="placeholder" @focus="props.show=true;" v-model="props.filter" style="border:none; background:none; outline:none !important;">
+      </div>
+      <div class="input-group-append">
+        <div class="input-group-text">
+          <i class="fa fa-fw fa-search"></i>
+        </div>
+      </div>
+    </label>
+
+    <div class="bg-light shadow" style="position:absolute; top:102%; width:100%; max-height:50vh; overflow:auto; z-index:8;" v-if="props.show">
+      <div v-for="s in compSegments">
+        <div class="p-2">
+          <small class="text-muted">&nbsp; {{ s.title }}:</small>
+        </div>
+        <label v-for="ss in s.children" class="d-block p-1" @click="valueEmit();">
+          <input type="checkbox" v-model="props.value" :value="ss.id" style="display:none;">
+          <span class="fa fa-fw fa-check" v-if="props.value.indexOf(ss.id)>-1"></span>
+          <span class="fa fa-fw" v-else></span> {{ ss.title }}
+        </label>
+      </div>
+    </div>
+  </div>
+  <!-- picker -->
+
 </div></template>
 
 <script>
@@ -104,14 +104,54 @@ export default {
     value: {default:function() { return []; }},
     edit: {default:false},
     placeholder: {default:''},
+    show: {default:false},
+    filter: {default:''},
   },
+
 
   data() {
     return {
+      props: Object.assign({}, this.$props),
       segment: (new ProfessionalSegments()).fields(),
       segments: {},
-      props: Object.assign({}, this.$props),
     };
+  },
+
+
+  watch: {
+    $props: {
+      deep: true,
+      handler(val, oval) {
+        this.props = Object.assign({}, val);
+      },
+    },
+  },
+
+
+  computed: {
+    compSegments() {
+      var filter=this.props.filter.toLowerCase(), segments={};
+      for(var i in this.segments) {
+        var s = Object.assign({}, this.segments[i]);
+        if (s.parent.length==0) {
+          s.children = {};
+
+          for(var ii in this.segments) {
+            var ss = Object.assign({}, this.segments[ii]);
+            if (ss.parent.indexOf(s.id)>-1) {
+              if (ss.title.toLowerCase().includes(filter)) {
+                s.children[ii] = ss;
+              }
+            }
+          }
+
+          if (Object.values(s.children).length>0) {
+            segments[i] = s;
+          }
+        }
+      }
+      return segments;
+    },
   },
 
 
@@ -120,24 +160,51 @@ export default {
       var segment = new ProfessionalSegments();
       segment.save(this.segment).then((resp) => {
         this.segmentEdit();
+        this.segmentSearch();
       });
     },
 
     segmentDelete() {
       (new ProfessionalSegments()).delete(this.segment.id).then((resp) => {
         this.segmentEdit();
+        this.segmentSearch();
       });
     },
 
     segmentEdit(merge) {
       this.segment = Object.assign((new ProfessionalSegments()).fields(), merge||{});
     },
+
+    segmentSearch() {
+      (new ProfessionalSegments()).search().then((segments) => {
+        this.segments = segments;
+      });
+    },
+
+    valueEmit() {
+      setTimeout(() => {
+        this.$emit('value', this.props.value);
+        this.$emit('input', this.props.value);
+      }, 100);
+    },
   },
 
   mounted() {
-    (new ProfessionalSegments()).value((segments) => {
+    (new ProfessionalSegments()).search().then((segments) => {
       this.segments = segments;
-    })
+    });
+
+    window.addEventListener('click', (ev) => {
+      if (!this.$refs.picker) return;
+      this.props.show = this.$refs.picker.contains(ev.target);
+    });
+
+    window.addEventListener('keyup', (ev) => {
+      setTimeout(() => {
+        if (ev.key!='Tab' || !document.activeElement || !this.$refs.picker) return;
+        this.props.show = this.$refs.picker.contains(document.activeElement);
+      }, 100);
+    });
   }
 };
 </script>

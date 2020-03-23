@@ -1,126 +1,93 @@
 <template><div>
     <div v-if="profile">
-    	<form @submit.prevent="profileSave();">
-    		<div class="fom-group">
-    			<label>Título</label>
-    			<input type="text" class="form-control" v-model="profile.title">
-    		</div>
+    	<div class="row">
+    		<div class="col-12 col-md-6">
+    			<form @submit.prevent="profileSave();">
+					<div class="fom-group">
+						<label>Título</label>
+						<input type="text" class="form-control" v-model="profile.title">
+					</div>
 
-    		<button type="submit" class="btn btn-primary btn-block">Salvar</button>
-    	</form>
+					<div class="fom-group">
+						<label>Descrição</label>
+						<textarea class="form-control" v-model="profile.description"></textarea>
+					</div>
+
+					<div class="fom-group">
+						<label>Areas</label>
+						<InputProfessionalArea v-model="profile.segments"></InputProfessionalArea>
+					</div>
+
+					<div class="row">
+						<div class="col">
+							<button type="button" class="btn btn-link btn-block" @click="profileEdit();">Limpar</button>
+						</div>
+
+						<div class="col">
+							<button type="submit" class="btn btn-primary btn-block">Salvar</button>
+						</div>
+					</div>
+				</form>
+    		</div>
+    		
+    		<div class="col-12 col-md-6">
+    			<div v-for="p in profiles">
+    				<div class="card">
+    					<div class="card-header">{{ p.title }}</div>
+    					<div class="card-body" v-html="p.description"></div>
+    					<div class="card-footer">
+    						<a href="javascript:;" class="btn btn-primary btn-sm" @click="profileEdit(p);">Editar</a>
+    					</div>
+    				</div><br>
+    			</div>
+    		</div>
+    	</div>
     </div>
-    <pre>$data: {{ $data }}</pre>
 </div></template>
 
 <script>
+import UserProfile from '~/db/UserProfile.js';
+import InputProfessionalArea from '~/components/InputProfessionalArea';
+
 export default {
-  data() {
-    return {
-    	profile: false,
-        profiles: {},
-        segments: [
-        	{id:'', title:'TI', subs: []},
-        	{id:'', title:'Design', subs: [
-        		{id:'', title:'Animação', subs: []},
-        		{id:'', title:'Autocad/Modelagem 3D', subs: []},
-        		{id:'', title:'Logos', subs: []},
-        		{id:'', title:'Mockup sites/sistemas/aplicativos', subs: []},
-        		{id:'', title:'Diagramador', subs: []},
-        		{id:'', title:'Edição de fotos', subs: []},
-        		{id:'', title:'Ilustração/Artes gráficas', subs: []},
-        		{id:'', title:'Outros', subs: []},
-        	]},
-        	{id:'', title:'Assistência Técnica', subs: [
-        		{id:'', title:'Celulares, smartphones, tablets e computadores', subs: []},
-        		{id:'', title:'Eletrônicos', subs: []},
-        		{id:'', title:'Eletrodomésticos', subs: []},
-        		{id:'', title:'Redes', subs: []},
-        		{id:'', title:'Câmeras', subs: []},
-        		{id:'', title:'Geladeiras e freezers', subs: []},
-        		{id:'', title:'Outros', subs: []},
-        	]},
-        	{id:'', title:'Aulas', subs: [
-        		{id:'', title:'Artes e artesanatos', subs: []},
-        		{id:'', title:'Dança', subs: []},
-        		{id:'', title:'Reforço escolar', subs: []},
-        		{id:'', title:'Esportes', subs: []},
-        		{id:'', title:'Idiomas', subs: []},
-        		{id:'', title:'Informática', subs: []},
-        		{id:'', title:'Música', subs: []},
-        		{id:'', title:'Outros', subs: []},
-        	]},
-        	{id:'', title:'Automóveis', subs: [
-        		{id:'', title:'Mecânica', subs: []},
-        		{id:'', title:'Vidraçaria', subs: []},
-        		{id:'', title:'Guincho', subs: []},
-        		{id:'', title:'Outros', subs: []},
-        	]},
-        	{id:'', title:'Consultoria', subs: [
-        		{id:'', title:'Assessor', subs: []},
-        		{id:'', title:'Contador', subs: []},
-        		{id:'', title:'Detetive', subs: []},
-        		{id:'', title:'Digitação e digitalização de documentos', subs: []},
-        		{id:'', title:'Pesquisas', subs: []},
-        		{id:'', title:'Produção/padronização/revisão de conteúdo', subs: []},
-        		{id:'', title:'Segurança', subs: []},
-        		{id:'', title:'Outros', subs: []},
-        	]},
-        	{id:'', title:'Festas e Eventos', subs: [
-        		{id:'', title:'Animação de Festas', subs: []},
-        		{id:'', title:'Buffet, Churrascaria, Confeitaria', subs: []},
-        		{id:'', title:'Bartender, Garçon', subs: []},
-        		{id:'', title:'Decoração, Equipamentos', subs: []},
-        		{id:'', title:'Video, Fotografia', subs: []},
-        		{id:'', title:'Recepção, Cerimônia', subs: []},
-        		{id:'', title:'Segurança', subs: []},
-        		{id:'', title:'Outros', subs: []},
-        	]},
-        	{id:'', title:'Moda e Beleza', subs: []},
-        	{id:'', title:'Reformas e Reparos', subs: []},
-        	{id:'', title:'Saúde', subs: []},
-        	{id:'', title:'Família', subs: []},
+	components: {
+		InputProfessionalArea,
+	},
 
-        	{id:'', title:'Administração e Contabilidade', subs: []},
-        	{id:'', title:'Advogado e Leis', subs: []},
-        	{id:'', title:'Atendimento ao Consumidor', subs: []},
-        	{id:'', title:'Design e Criação', subs: []},
-        	{id:'', title:'Engenharia e Arquitetura', subs: []},
-        	{id:'', title:'Escrita', subs: []},
-        	{id:'', title:'Fotografia e Audiovisual', subs: []},
-        	{id:'', title:'Suporte Administrativo', subs: []},
-        	{id:'', title:'Tradução', subs: []},
-        	{id:'', title:'Vendas e Marketing', subs: []},
-        	{id:'', title:'TI', subs: []},
-        ],
-    };
-  },
+	data() {
+		return {
+			profile: this.profileDefault(),
+			profiles: [],
+		};
+	},
 
-  methods: {
-  	profileDefault(merge) {
-  		return Object.assign({
-  			userId: this.$store.state.auth.user.uid,
-  			title: this.$store.state.auth.user.displayName,
-  			description: '',
-  			contacts: [],
-  			portfolio: [],
-  		}, merge||{});
-  	},
+	methods: {
+		profileDefault() {
+			var data = (new UserProfile()).fields();
+			data.userId = this.$store.state.auth.user.uid;
+			return data;
+		},
 
-  	profileSave() {
-  		this.$firebaseDbSave('user-profile', this.profile);
-  	},
-  },
+		profileEdit(data) {
+			this.profile = Object.assign({}, this.profileDefault(), data||{});
+		},
 
-  mounted() {
-  	this.$firebaseDb('user-profile').orderByChild('userId').equalTo(this.$store.state.auth.user.uid).on('value', (snap) => {
-  		this.profiles = snap.val() || {};
-  		if (Object.values(this.profiles).length==0) {
-  			this.profile = this.profileDefault();
-  		}
-  		else {
-  			this.profile = this.profileDefault(Object.values(this.profiles)[0]);
-  		}
-  	});
-  },
+		profileSave() {
+			(new UserProfile()).save(this.profile).then((resp) => {
+				this.profile = this.profileDefault();
+				this.profileSearch();
+			});
+		},
+
+		profileSearch() {
+			(new UserProfile()).search([['userId', '==', this.$store.state.auth.user.uid]]).then((resp) => {
+				this.profiles = resp;
+			});
+		}
+	},
+
+	mounted() {
+		this.profileSearch();
+	},
 }
 </script>

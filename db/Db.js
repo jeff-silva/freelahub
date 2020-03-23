@@ -30,45 +30,53 @@ export default class Db
 		return new Promise((resolve, reject) => {
 			data = typeof data=='object'? data: {};
 			data = Object.assign(this.fields(), data);
-			
+
 			this.validate(data);
 			if (this.error()) {
 				return reject(this.error());
 			}
 
-			var ref = firebase.database().ref(this.ref);
-			
-			if (data.id) {
-				ref.child(data.id).set(data);
+			var _update = () => {
+				firebase.firestore().collection(this.ref).doc(data.id).set(data).then((resp) => {
+					resolve(data);
+				})
 			}
-			else {
-				let newref = ref.push();
-				data.id = newref.key;
-				newref.set(data);
+
+			if (! data.id) {
+				return firebase.firestore().collection(this.ref).add(data).then((resp) => {
+					data.id = resp.id;
+					_update(data);
+				});
 			}
-			resolve(data);
+
+			_update(data);
 		});
 	}
 
-	search() {
-		firebase.database().ref(this.ref).once('value');
-	}
+	search(params) {
+		return new Promise((resolve, reject) => {
+			var ref = firebase.firestore().collection(this.ref);
 
-	value(callback) {
-		callback = typeof callback=='function'? callback: () => {};
-		firebase.database().ref(this.ref).on('value', (snap) => {
-			var ret={}, data = snap.val()||{};
-			for(var i in data) {
-				ret[i] = Object.assign(this.fields(), data[i]);
+			params = params||{};
+			for(var i in params) {
+				ref = ref.where(params[i][0], params[i][1], params[i][2]);
 			}
-			callback(ret);
+
+			ref.get().then((snap) => {
+				var items = {};
+				snap.forEach((doc) => {
+					items[doc.id] = doc.data();
+				});
+				resolve(items);
+			});
 		});
 	}
 
 	delete(id) {
 		return new Promise((resolve, reject) => {
-			firebase.database().ref(`${this.ref}/${id}`).set(null);
-			resolve(id);
-		})
+			firebase.firestore().collection(this.ref).doc(id).delete().then((resp) => {
+				resolve(id);
+			});
+		});
 	}
 }
