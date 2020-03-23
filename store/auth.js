@@ -103,8 +103,8 @@ export default {
 					if (user) {
 						user = user.providerData[0]||false;
 						commit('user', user);
-						commit('loading', false);
 					}
+					commit('loading', false);
 					resolve(user);
 				});
 			});

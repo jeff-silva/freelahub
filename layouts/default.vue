@@ -1,5 +1,21 @@
 <template><div>
-  <AppView :auth="$store.getters['auth/user']">
+  <AppView :auth="$store.getters['auth/user']" :loading="false">
+    <!-- loading -->
+    <template v-slot:loading>
+      <div style="position:fixed; top:0px; left:0px; width:100%; height:100%; background:#ffffff99; z-index:9; display:flex; align-items:center; justify-content:center;">
+        <i class="fa fa-fw fa-spin fa-spinner"></i> Loading...
+      </div>
+    </template>
+    <!-- loading -->
+
+    <!-- auth -->
+    <template v-slot:auth>
+      <div style="width:90%; max-width:400px; background:#eee; padding:15px;">
+        <Auth></Auth>
+      </div>
+    </template>
+    <!-- auth -->
+
     <!-- auth -->
     <template v-slot:auth>
       <div style="width:90%; max-width:400px; background:#eee; padding:15px;">
@@ -24,12 +40,21 @@
     <!-- drawer -->
     <template v-slot:drawer>
       <div style="background:#f5f5f5; padding:25px 15px;">
-        <div>User Name</div>
-        <div>username@grr.la</div>
+        <div class="row no-gutters align-items-center">
+          <div class="col-3">
+            <img :src="$store.state.auth.user.photoURL" alt="" style="width:100%; border-radius:50% !important;">
+          </div>
+          <div class="col p-3">
+            <div>{{ $store.state.auth.user.displayName }}</div>
+            <div>{{ $store.state.auth.user.email }}</div>
+          </div>
+        </div>
       </div>
       <div class="list-group">
         <nuxt-link class="list-group-item" data-close to="/">Dashboard</nuxt-link>
-        <nuxt-link class="list-group-item" data-close to="/bbb">Bbb</nuxt-link>
+        <nuxt-link class="list-group-item" data-close to="/settings">Settings</nuxt-link>
+        <nuxt-link class="list-group-item" data-close to="/profile">Profile</nuxt-link>
+        <nuxt-link class="list-group-item" data-close to="/test">Test</nuxt-link>
         <a href="javascript:;" class="list-group-item" data-close @click="$store.dispatch('auth/logout');">Logout</a>
       </div>
     </template>
@@ -45,6 +70,7 @@
 
 
 <script>
+import { mapGetters } from 'vuex';
 import AppView from '~/components/AppView.vue';
 import Auth from '~/components/Auth.vue';
 

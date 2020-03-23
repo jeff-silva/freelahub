@@ -18,7 +18,10 @@
           <input type="password" class="form-control" v-model="login.post.pass">
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">Login</button>
+        <button type="submit" class="btn btn-primary btn-block">
+          <i class="fa fa-fw fa-spin fa-spinner" v-if="$store.state.auth.loading"></i>
+          <span v-else>Login</span>
+        </button>
       </form>
     </div>
 
@@ -34,7 +37,10 @@
           <input type="password" class="form-control" v-model="register.post.pass">
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">Register</button>
+        <button type="submit" class="btn btn-primary btn-block">
+          <i class="fa fa-fw fa-spin fa-spinner" v-if="$store.state.auth.loading"></i>
+          <span v-else>Regsiter</span>
+        </button>
       </form>
     </div>
 
@@ -50,7 +56,10 @@
           <input type="password" class="form-control">
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">Password</button>
+        <button type="submit" class="btn btn-primary btn-block">
+          <i class="fa fa-fw fa-spin fa-spinner" v-if="$store.state.auth.loading"></i>
+          <span v-else>Password</span>
+        </button>
       </form>
     </div>
 
